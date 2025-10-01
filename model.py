@@ -15,33 +15,20 @@ flag(r, c) -> toggle flags
 '''
 import random
 
-size=7
-mines=8
+size=9
+mines=10
 opened=0
 
-#rowzero = ['0' , '0','0','0','0','0','0','0']
-#grid=[ rowzero, rowzero, rowzero, rowzero, rowzero, rowzero, rowzero, rowzero]
 grid = [[0 for _ in range(size)] for _ in range(size)]
 grid_flag = [[0 for _ in range(size)] for _ in range(size)]
 grid_hash = [['#' for _ in range(size)] for _ in range(size)]
 
-print("MINESWOOPER")
-for i in range(0,size):
-    for j in range(0,size):
-        #print('# ', end='')
-        #grid_num = random.randint(0, 8)
-        #grid[i][j]=grid_num
-        print((grid_hash[i][j]), end=' ')
-    print()
-
 def place_mines():
-    #print("place mines function")
     temp=0
 
     while (temp<mines):
       tempr= random.randint(0, size-1)
       tempc= random.randint(0, size-1)
-      #print(tempr, tempc)
       if grid[tempr][tempc] != '*':
           grid[tempr][tempc]= '*'
           temp+=1
@@ -66,10 +53,7 @@ def show_hashgrid():
             print((grid_hash[i][j]), end=' ')
         print()
 
-place_mines()
-
 def place_numbers():
-    #print("place numbers function")
 
     for i in range(0, size):
         for j in range(0, size):
@@ -92,9 +76,6 @@ def place_numbers():
             print(grid[i][j], end=' ')
         print()
 '''
-
-place_numbers()
-
 '''
 def check_mine(row, col):
     print("in the checking function")
@@ -124,20 +105,17 @@ def check_mine(row, col):
     if row < 0 or col < 0 or row >= size or col >= size:
         return
 
-    # Stop if already revealed
     if grid_hash[row][col] != '#':
         return
 
-    # Reveal the current cell
     if grid[row][col] == 0:
         grid_hash[row][col] = '0'
         opened+=1
     else:
         grid_hash[row][col] = str(grid[row][col])
         opened+=1
-        return  # Stop if it's a number (not 0)
+        return
 
-    # Recurse to neighbors if 0
     for dr in [-1, 0, 1]:
         for dc in [-1, 0, 1]:
             if dr != 0 or dc != 0:
@@ -146,56 +124,70 @@ def check_mine(row, col):
 def flag_set():
     print("Flag setting function")
 
-while(1):
 
-    if(size*size-opened == mines):
-        print("YOU WON! :)")
-        break
+def main():
+    print("MINESWOOPER")
+    for i in range(0, size):
+        for j in range(0, size):
+            print((grid_hash[i][j]), end=' ')
+        print()
 
-    choice=input("Flag or Mine? (f/m): ")
+    place_mines()
+    place_numbers()
 
-    if(choice == "M" or choice=="m"):
-        print("Mine")
+    while(1):
 
-        row= int(input(f"Enter Row Value (1-{size}): "))
-        col= int(input(f"Enter Col Value (1-{size}): "))
-
-        if(row>size or row<1 or col>size or col<1):
-            print("Invalid number enter again")
-
-        elif (grid_flag[row-1][col-1] == 1):
-            print("Flagged!! try another cell")
-
-        elif (grid[row-1][col-1] == '*'):
-            print("GAME OVER :(")
-            show_fullgrid()
+        if(size*size-opened == mines):
+            print("YOU WON! :)")
             break
 
+        choice=input("Flag or Mine? (f/m): ")
+
+        if(choice == "M" or choice=="m"):
+            print("Mine")
+
+            row= int(input(f"Enter Row Value (1-{size}): "))
+            col= int(input(f"Enter Col Value (1-{size}): "))
+
+            if(row>size or row<1 or col>size or col<1):
+                print("Invalid number enter again")
+
+            elif (grid_flag[row-1][col-1] == 1):
+                print("Flagged!! try another cell")
+
+            elif (grid[row-1][col-1] == '*'):
+                print("GAME OVER :(")
+                show_fullgrid()
+                break
+
+            else:
+                check_mine(row-1, col-1)
+                show_hashgrid()
+
+        elif (choice == "F" or choice == 'f'):
+            print("Flagging")
+            frow = int(input(f"Enter Row Value (1-{size}): "))
+            fcol = int(input(f"Enter Col Value (1-{size}): "))
+
+            frow-=1
+            fcol-=1
+
+            if(grid_flag[frow][fcol]==0):
+                grid_hash[frow][fcol]= "F"
+                grid_flag[frow][fcol] =1
+
+                show_hashgrid()
+
+            else:
+                print(f"Removed flag from {frow+1},{fcol+1}")
+                grid_hash[frow][fcol] = "#"
+                grid_flag[frow][fcol] = 0
+
+                show_hashgrid()
+
         else:
-            #print("hi")
-            check_mine(row-1, col-1)
-            show_hashgrid()
+            print("Invalid Character enter again!!!")
 
-    elif (choice == "F" or choice == 'f'):
-        print("Flagging")
-        frow = int(input(f"Enter Row Value (1-{size}): "))
-        fcol = int(input(f"Enter Col Value (1-{size}): "))
 
-        frow-=1
-        fcol-=1
-
-        if(grid_flag[frow][fcol]==0):
-            grid_hash[frow][fcol]= "F"
-            grid_flag[frow][fcol] =1
-
-            show_hashgrid()
-
-        else:
-            print(f"Removed flag from {frow+1},{fcol+1}")
-            grid_hash[frow][fcol] = "#"
-            grid_flag[frow][fcol] = 0
-
-            show_hashgrid()
-
-    else:
-        print("Invalid Character enter again!!!")
+if __name__ == '__main__':
+    main()
